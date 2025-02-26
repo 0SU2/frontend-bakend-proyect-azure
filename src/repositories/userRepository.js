@@ -1,8 +1,8 @@
-import IUserRepository from "../interfaces/IUserRepository";
-import { db } from "../config/firebase";
+import IUserRepository from "../interfaces/IUserRepository.js";
+import { db } from "../config/firebase.js";
 
 export default class UserRepository extends IUserRepository {
-  contructor() {
+  constructor() {
     super()
     this.collection = db.collection('usuarios-ts');
   }
@@ -38,8 +38,8 @@ export default class UserRepository extends IUserRepository {
   }
   
   async findByUser(usuario) {
-    const usuario = await this.collection.where('usuario', '==', usuario).get();
-    return usuario.empty? null : { id: usuario.docs[0].id, ...usuario.docs[0].data() }
+    const usuarios = await this.collection.where('usuario', '==', usuario).get();
+    return usuarios.empty? null : { id: usuarios.docs[0].id, ...usuarios.docs[0].data() }
   }
 
   async findByRol(rol) {

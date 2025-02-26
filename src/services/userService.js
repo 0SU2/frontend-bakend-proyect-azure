@@ -1,4 +1,4 @@
-import UserRepository from "../repositories/userRepository";
+import UserRepository from "../repositories/userRepository.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -60,5 +60,67 @@ export default class UserService {
     }
 
     await this.userRepository.delete(id);
+  }
+
+  async login(username, password) {
+    const user = await this.userRepository.findByUser(usuario);
+    if (!user) {
+      throw { message: 'Usuario no encontrado', statusCode: 404 }
+    }
+    if(user.bloqueado) {
+      throw { message: 'Usuario Bloqueado contacta al Administrador', statusCode: 401 }
+    }
+
+    const existingToken = await this.userRepository.getSessionToken(user.id);
+    if (existingToken) {
+      throw { message: 'Ya hay una sesion activa', statusCode: 401 }
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      await this.handleFailedLogin(user.id);
+      throw { message: 'Contraseña incorrecta', statusCode: 401 }
+    }
+
+    const token = jwt.sign({ id: user.id, usuario: user.usuario, rol: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    await this.userRepository.updateSessionToken(user.id, token);
+    return token;
+  }
+
+  async logout(userId, token) {
+    const sessionToken = await this.userRepository.getSessionToken(userId);
+    if (sessionToken !== token) {
+      throw { message: 'Token invalido', statusCode: 401 }
+    }
+    await this.userRepository.updateSessionToken(userId, null); // null para que se borre el token
+    await TokenService.revokeToken(token);
+  }
+
+  async unlockUser(id) {
+    const user = await this.userRepository.getById(id);
+    if (!user) {
+      throw { message: 'Usuario no Encontrado', statusCode: 404 }
+    }
+
+    await this.userRepository.update(id, { bloqueado: false, intentos: 0 }); // reseteo de intentos
+  }
+  
+  async handleFailedLogin(id) {
+    const user = await this.userRepository.getById(id);
+    const intentos  = user.intentos + 1;
+    if (intentos >= 3) {
+      await this.userRepository.update(id, { bloqueado: true });
+      throw { message: 'Usuario bloqueado despues de 3 intentos, contacta al Administrador', statusCode: 401 }
+    }
+    await this.userRepository.update(id, { intentos });
+  }
+
+  async getByUser(usuario) {
+    const user = await this.userRepository.findByUser(usuario);
+    if (!user) {
+      throw { message: 'Usuario No Encontrado', statusCode: 404 }
+    }
+
+    return user
   }
 }
