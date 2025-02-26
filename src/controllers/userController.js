@@ -55,7 +55,7 @@ export default class UserController {
     }
   }
 
-  async dalete(req, res, next) {
+  async delete(req, res, next) {
     try {
       const { id } = req.params;
       await this.userService.delete(id);

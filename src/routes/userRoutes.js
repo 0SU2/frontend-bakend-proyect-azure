@@ -61,7 +61,7 @@ userRouters.forEach((route) => {
   router[route.method](
     route.path,
     ...(route.middleware || []),
-    userController[route.handler].bind(userController)
+    userController[route.handler]
   )
 })
 
