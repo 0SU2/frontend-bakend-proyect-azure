@@ -24,19 +24,19 @@ export default class UserRepository extends IUserRepository {
 
   async getAll() {
     const usuarios = await this.collection.get();
-    return usuarios.docs.map((user) => ({ id: doc.id, ...doc.data() }))
+    return usuarios.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
   }
 
   async getById(id) {
-    const usuario = await this.collection.get(id);
-    return usuario.empty? null : { id: usuario.docs[0].id, ...usuario.docs[0].data() }
+    const usuario = await this.collection.doc(id).get();
+    return usuario.empty? null : { id: usuario.id, ...usuario.data() }
   }
 
   async findByFullName(nombre, apaterno, amaterno) {
     const usuario = await this.collection.where('nombre', '==', nombre).where('apaterno', '==', apaterno).where('amaterno', '==', amaterno).get();
-    return usuario.empty? null : { id: usuario.docs[0].id, ...usuario.docs[0].data() }
+    return usuario.empty ? null : { id: usuario.docs[0].id, ...usuario.docs[0].data() }
   }
-  
+
   async findByUser(usuario) {
     const usuarios = await this.collection.where('usuario', '==', usuario).get();
     return usuarios.empty? null : { id: usuarios.docs[0].id, ...usuarios.docs[0].data() }

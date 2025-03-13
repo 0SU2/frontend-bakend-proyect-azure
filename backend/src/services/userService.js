@@ -1,10 +1,13 @@
 import UserRepository from "../repositories/userRepository.js";
-import bcrypt from 'bcrypt';
+import TokeService from "./tokenServices.js";
+import { Usuario } from "../models/Usuario.js";
+import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
 
 export default class UserService {
   constructor() {
     this.userRepository = new UserRepository();
+    this.TokenService = new TokeService();
   }
 
   async getAll() {
@@ -32,25 +35,29 @@ export default class UserService {
       throw { message: 'El usuario ya existe', statusCode: 404 }
     }
 
-    // Verificar el nombre completo 
-    const uniqueFullName = this.userRepository.findByFullName(nombre, apaterno, amaterno);
+    // Verificar el nombre completo
+    const uniqueFullName = await this.userRepository.findByFullName(nombre, apaterno, amaterno);
     if (uniqueFullName) {
       throw { message: 'Ya existe un usuario con el mismo nombre completo', statusCode: 404 }
     }
 
     // Encriptar Contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = { ...userData, password: hashedPassword };
-    return this.userRepository.create(newUser);
+    const newUser = new Usuario({ ...userData, password: hashedPassword });
+    return this.userRepository.create({...newUser});
   }
 
   async update(id, userData) {
     const { password } = userData;
-    const updateUser = { ...userData };
+    const updateUser = await this.userRepository.getById(id);
+    if (!updateUser) {
+      throw { message: 'Usuario no encontrado', statusCode: 404 }
+    }
     if (password) {
       updateUser.password = await bcrypt.hash(password, 10);
     }
-    return this.userRepository.update(id, updateUser);
+    const newUser = new Usuario({ ...updateUser })
+    return this.userRepository.update(id, { ...newUser });
   }
 
   async delete(id) {
@@ -63,7 +70,7 @@ export default class UserService {
   }
 
   async login(username, password) {
-    const user = await this.userRepository.findByUser(usuario);
+    const user = await this.userRepository.findByUser(username);
     if (!user) {
       throw { message: 'Usuario no encontrado', statusCode: 404 }
     }
@@ -104,7 +111,7 @@ export default class UserService {
 
     await this.userRepository.update(id, { bloqueado: false, intentos: 0 }); // reseteo de intentos
   }
-  
+
   async handleFailedLogin(id) {
     const user = await this.userRepository.getById(id);
     const intentos  = user.intentos + 1;

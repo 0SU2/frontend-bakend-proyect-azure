@@ -36,8 +36,8 @@ export default class UserController {
 
   async create(req, res, next) {
     try {
-      const userData = req.params;
-      const users = await this.userService.findByRol(userData);
+      const userData = req.body;
+      const users = await this.userService.create(userData);
       res.status(201).json(users);
     } catch (error) {
       next(error);
@@ -69,7 +69,7 @@ export default class UserController {
     try {
       const { usuario, password } = req.body;
       const token = await this.userService.login(usuario, password);
-      res.json(token);
+      res.json({ token });
     } catch (error) {
       next(error);
     }
@@ -77,7 +77,7 @@ export default class UserController {
 
   async logout(req, res, next) {
     try {
-      
+
       const authHeader = req.headers.authorization;
       if (!authHeader) {
         throw { message: 'Token no proporcionado', statusCode: 400 }
@@ -104,18 +104,16 @@ export default class UserController {
 
   async getUserByUsername(req, res, next) {
     try {
-      
-      const { username } = req.user;
+      const { usuario } = req.user;
       if (!usuario) {
         throw { message: 'Usuario no encontrado', statusCode: 404 }
       }
 
-      const user = await this.userService.getByUser(username);
+      const user = await this.userService.getByUser(usuario);
       if (!user) {
         throw { message: 'Usuario no encontrado', statusCode: 404 }
       }
-
-      res.json(user);
+      res.json( { user } );
     } catch (error) {
       next(error);
     }

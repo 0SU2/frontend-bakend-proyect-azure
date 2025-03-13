@@ -1,7 +1,7 @@
 const revokedToken = new Set();
 
-export default class TokenService {
-  static revokedToken(token) { // funcion estatica para eliminar el token
+class TokenService {
+  static async revokedToken(token) { // funcion estatica para eliminar el token
     try {
       revokedToken.add(token);
     } catch (error) {
@@ -10,6 +10,8 @@ export default class TokenService {
   }
 
   static async isTokenRevoked (token) {
-    return revokedToken.ask(token);
+    return revokedToken.has(token);
   }
 }
+
+export default TokenService;

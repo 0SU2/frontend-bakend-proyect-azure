@@ -9,8 +9,8 @@ const userController = new UserController();
 const userRouters = [
   {
     method: 'get',
-    path: '/',
-    middleware: [ authMiddleware, roleMiddleWare('admin', 'soporte')],
+    path: '/getAll',
+    middleware: [ authMiddleware ],
     handler: 'getAll'
   },
   {
@@ -22,7 +22,7 @@ const userRouters = [
   {
     method: 'put',
     path: '/update/:id',
-    middleware: [ authMiddleware, roleMiddleWare('admin', 'soporte')],
+    // middleware: [ authMiddleware, roleMiddleWare('admin', 'soporte')],
     handler: 'update'
   },
   {
@@ -61,7 +61,7 @@ userRouters.forEach((route) => {
   router[route.method](
     route.path,
     ...(route.middleware || []),
-    userController[route.handler]
+    userController[route.handler].bind(userController)
   )
 })
 
