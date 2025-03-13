@@ -273,6 +273,18 @@ export default {
           password: '',
           rol: 'contabilidad'
         }
+        // TO - DO
+        // Please, fix this...
+        Estate.options.forEach((dataDoc, index) => {
+          this.estados[index] = dataDoc.label
+          if (dataDoc.label === this.userData.estado) {
+            this.municipios = []
+            dataDoc.value.forEach((cityDoc, index) => {
+              this.municipios[index] = cityDoc
+            })
+          }
+        })
+        // I mean, wtf brah.
       } else if (mode === 'delete') { // borrar
         this.selectedUser = user
         this.deleteDialog = true

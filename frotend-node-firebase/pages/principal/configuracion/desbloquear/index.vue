@@ -45,10 +45,17 @@ export default {
   methods: {
     async fetchUsuariosBloqueados () {
       try {
-        const response = await this.$axios.get('/users/getAll')
+        const response = await this.$axios.get('/users')
+        let copyOfUsuario = []
         this.usuariosBloqueados = []
-        // this.usuariosBloqueados = response.data.user.filter(user => user.bloqueado)
-        console.log('data -> ', response)
+        this.usuariosBloqueados = response.data
+        this.usuariosBloqueados.forEach((myResponse) => {
+          if (myResponse.bloqueado) {
+            copyOfUsuario.push({ ...myResponse })
+          }
+        })
+        this.usuariosBloqueados = copyOfUsuario
+        copyOfUsuario = []
       } catch (error) {
         const errorMessage = error.message || 'Error al obtener los usuarios'
         this.$store.dispatch('alert/triggerAlert', {
@@ -58,6 +65,8 @@ export default {
       }
     },
     async desbloquearUsuario (id) {
+      console.log('id -> ', id)
+      console.log('user -> ', this.usuariosBloqueados)
       try {
         await this.$axios.post(`/users/unlock${id}`)
         this.fetchUsuariosBloqueados()

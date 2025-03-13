@@ -9,7 +9,7 @@ const userController = new UserController();
 const userRouters = [
   {
     method: 'get',
-    path: '/getAll',
+    path: '/',
     middleware: [ authMiddleware ],
     handler: 'getAll'
   },
@@ -46,7 +46,7 @@ const userRouters = [
   {
     method: 'post',
     path: '/unlock:id',
-    middleware: [ authMiddleware, roleMiddleWare('admin', 'soport')],
+    // middleware: [ authMiddleware, roleMiddleWare('admin', 'soport')],
     handler: 'unlockUser'
   },
   {

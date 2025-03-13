@@ -94,7 +94,7 @@ export default class UserController {
 
   async unlockUser(req, res, next) {
     try {
-      const { id } = req.body;
+      const { id } = req.params;
       await this.userService.unlockUser(id);
       res.status(204).json({ message: 'Usuario desbloqueado' });
     } catch (error) {
