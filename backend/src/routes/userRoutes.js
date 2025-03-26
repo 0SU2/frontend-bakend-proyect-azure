@@ -10,25 +10,25 @@ const userRouters = [
   {
     method: 'get',
     path: '/',
-    middleware: [ authMiddleware ],
+    middleware: [ authMiddleware, roleMiddleWare('admin') ],
     handler: 'getAll'
   },
   {
     method: 'post',
     path: '/create',
-    // middleware: [ authMiddleware, roleMiddleWare('admin', 'soporte')],
+    middleware: [ authMiddleware, roleMiddleWare('admin') ],
     handler: 'create'
   },
   {
     method: 'put',
     path: '/update/:id',
-    // middleware: [ authMiddleware, roleMiddleWare('admin', 'soporte')],
+    middleware: [ authMiddleware, roleMiddleWare('admin') ],
     handler: 'update'
   },
   {
     method: 'delete',
     path: '/delete/:id',
-    middleware: [ authMiddleware, roleMiddleWare('admin', 'soporte')],
+    middleware: [ authMiddleware, roleMiddleWare('admin') ],
     handler: 'delete'
   },
   {
@@ -46,7 +46,7 @@ const userRouters = [
   {
     method: 'post',
     path: '/unlock:id',
-    // middleware: [ authMiddleware, roleMiddleWare('admin', 'soport')],
+    middleware: [ authMiddleware, roleMiddleWare('admin') ],
     handler: 'unlockUser'
   },
   {
