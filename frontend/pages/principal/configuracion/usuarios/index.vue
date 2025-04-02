@@ -180,7 +180,7 @@
 import { Estate } from '~/static/EntryDataState.js'
 export default {
   layout: 'principal',
-  middleware: ['auth'],
+  middleware: 'auth',
   data () {
     return {
       estados: [],

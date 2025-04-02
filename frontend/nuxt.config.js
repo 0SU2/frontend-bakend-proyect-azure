@@ -36,7 +36,7 @@ export default {
   ],
 
   axios: {
-    baseURL: process.env.baseURL,
+    baseURL: process.env.baseURL || 'https://backend-node-computo-nube-byhgenb8cab6bqaj.canadacentral-01.azurewebsites.net/api'
   },
 
   auth: {

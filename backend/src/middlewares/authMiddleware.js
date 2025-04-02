@@ -16,8 +16,12 @@ const authMiddleware = async(req, res, next) => {
   const userRepository = new UserRepository();
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.id) {
+      throw { message: 'Token sin ID de usuario', statusCode: 401 };
+    }
     const existingToken = await userRepository.getSessionToken(decoded.id);
-    if (existingToken !== token || await TokenService.isTokenRevoked(token)) {
+    const isRevoked = await TokenService.isTokenRevoked(token);
+    if (existingToken !== token || isRevoked) {
       throw { message: 'Token invalido', statusCode: 401}
     }
     req.user = decoded;

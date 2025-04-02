@@ -114,6 +114,9 @@ export default class UserService {
 
   async handleFailedLogin(id) {
     const user = await this.userRepository.getById(id);
+    if (!user) {
+      throw { message: 'Usuario No Encontrado', statusCode: 404 };
+    }
     const intentos  = user.intentos + 1;
     if (intentos >= 3) {
       await this.userRepository.update(id, { bloqueado: true });
